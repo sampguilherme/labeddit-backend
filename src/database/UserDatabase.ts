@@ -33,5 +33,7 @@ export class UserDatabase extends BaseDatabase {
         const [userDB]:UserDB[] | undefined[] = await BaseDatabase
         .connection(UserDatabase.TABLE_USERS)
         .where({ email })
+
+        return userDB
     }
 }
