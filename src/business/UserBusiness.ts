@@ -43,6 +43,9 @@ export class UserBusiness {
     public signup = async (input: SignupInput): Promise<SignupOutput> => {
         const { nickname, email, password } = input
 
+        const emailRegex = /\S+@\S+\.\S+/
+        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/
+
         if(typeof nickname !== "string"){
             throw new Error("'password' deve ser string")
         }
@@ -51,9 +54,23 @@ export class UserBusiness {
             throw new Error("'email' deve ser string")
         }
 
-        if(typeof password !== "string"){
-            throw new Error("'email' deve ser string")
+        if(!email.match(emailRegex)){
+            throw new BadRequestError("'email' inválido")
         }
+
+        const emailExist = await this.userDatabase.findUserByEmail(email)
+        if(emailExist){
+            throw new BadRequestError("'email' já cadrastado")
+        }
+
+        if(typeof password !== "string"){
+            throw new Error("'password' deve ser string")
+        }
+
+        if(!password.match(passwordRegex)){
+            throw new BadRequestError("'password' deve conter no mínimo oito caracteres, pelo menos uma letra e um número")
+        }
+
 
         const id = this.idGenerator.generate()
 
