@@ -17,9 +17,9 @@ export interface LoginOutputDTO {
 }
 
 export interface SignupInput {
-    nickname: unknown,
-    email: unknown,
-    password: unknown
+    nickname: string,
+    email: string,
+    password: string
 }
 
 export interface SignupOutput {

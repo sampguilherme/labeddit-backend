@@ -1,10 +1,11 @@
 import { UserDatabase } from "../database/UserDatabase";
-import { GetUsersInputDTO, GetUsersOutputDTO, SignupInput, SignupOutput } from "../dtos/userDTO";
+import { GetUsersInputDTO, GetUsersOutputDTO, LoginInputDTO, LoginOutputDTO, SignupInput, SignupOutput } from "../dtos/userDTO";
 import { BadRequestError } from "../errors/BadRequestError";
 import { User } from "../models/User";
 import { IdGenerator } from "../services/IdGenerator";
 import { HashManager } from "../services/HashManager";
 import { TokenManager, TokenPayload } from "../services/TokenManager";
+import { NotFoundError } from "../errors/NotFoundError";
 
 
 export class UserBusiness {
@@ -47,28 +48,20 @@ export class UserBusiness {
         const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/
 
         if(typeof nickname !== "string"){
-            throw new Error("'password' deve ser string")
-        }
-
-        if(typeof email !== "string"){
-            throw new Error("'email' deve ser string")
+            throw new Error("'apelido' deve ser string")
         }
 
         if(!email.match(emailRegex)){
-            throw new BadRequestError("'email' inválido")
+            throw new BadRequestError("E-mail inválido")
         }
 
         const emailExist = await this.userDatabase.findUserByEmail(email)
         if(emailExist){
-            throw new BadRequestError("'email' já cadrastado")
-        }
-
-        if(typeof password !== "string"){
-            throw new Error("'password' deve ser string")
+            throw new BadRequestError("E-mail já cadrastado")
         }
 
         if(!password.match(passwordRegex)){
-            throw new BadRequestError("'password' deve conter no mínimo oito caracteres, pelo menos uma letra e um número")
+            throw new BadRequestError("Sua senha deve conter no mínimo oito caracteres, pelo menos uma letra e um número")
         }
 
 
@@ -96,6 +89,52 @@ export class UserBusiness {
 
         const output: SignupOutput = {
             message: "Cadastro realizado com sucesso",
+            token
+        }
+
+        return output
+    }
+
+    public login = async (input: LoginInputDTO): Promise<LoginOutputDTO> => {
+        const { email, password } = input
+
+        if(typeof password !== "string"){
+            throw new Error("'password' deve ser string")
+        }
+
+        if(typeof email !== "string"){
+            throw new Error("'email' deve ser string")
+        }
+
+        const userDB = await this.userDatabase.findUserByEmail(email)
+
+        if(!userDB){
+            throw new NotFoundError("E-mail não cadastrado")
+        }
+
+        const user = new User(
+            userDB.id,
+            userDB.nickname,
+            userDB.password,
+            userDB.email,
+            userDB.created_at
+        )
+
+        const isPassWordCorrect = await this.hashManager.compare(password, user.getPassword())
+
+        if(!isPassWordCorrect){
+            throw new BadRequestError("E-mail ou senha incorreto")
+        }
+
+        const payload: TokenPayload =   {
+            id: user.getId(),
+            nickname: user.getNickname()
+        }
+
+        const token = this.tokenManager.createToken(payload)
+
+        const output: LoginOutputDTO = {
+            message: "Login realizado com sucesso",
             token
         }
 

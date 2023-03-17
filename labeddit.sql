@@ -16,3 +16,9 @@ VALUES
 DROP TABLE users;
 
 SELECT * FROM users;
+
+UPDATE users
+SET password = "$2y$12$mez/RUyqUnZpYUtkQ38Te.jRE7TagJ1xGvLJukTW15IsYdC.tflIC"
+WHERE id = "u003";
+
+SELECT * FROM users;
