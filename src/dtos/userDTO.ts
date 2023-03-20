@@ -7,8 +7,8 @@ export interface GetUsersInputDTO {
 export type GetUsersOutputDTO = UserModel[]
 
 export interface LoginInputDTO {
-    email: unknown,
-    password: unknown
+    email: string,
+    password: string
 }
 
 export interface LoginOutputDTO {
