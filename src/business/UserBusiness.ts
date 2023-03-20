@@ -47,21 +47,25 @@ export class UserBusiness {
         const emailRegex = /\S+@\S+\.\S+/
         const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/
 
-        if(typeof nickname !== "string"){
-            throw new Error("'apelido' deve ser string")
+        if(nickname.length < 1 || email.length < 1 || password.length < 1){
+            throw new BadRequestError("Preencha os campos vazios.")
+        }
+
+        if(nickname.length < 2){
+            throw new BadRequestError("Seu apelido deve conter 2 ou mais caracteres.")
         }
 
         if(!email.match(emailRegex)){
-            throw new BadRequestError("E-mail inválido")
+            throw new BadRequestError("E-mail inválido.")
         }
 
         const emailExist = await this.userDatabase.findUserByEmail(email)
         if(emailExist){
-            throw new BadRequestError("E-mail já cadrastado")
+            throw new BadRequestError("E-mail já cadrastado.")
         }
 
         if(!password.match(passwordRegex)){
-            throw new BadRequestError("Sua senha deve conter no mínimo oito caracteres, pelo menos uma letra e um número")
+            throw new BadRequestError("Sua senha deve conter no mínimo oito caracteres, pelo menos uma letra e um número.")
         }
 
 
@@ -88,7 +92,7 @@ export class UserBusiness {
         const token = this.tokenManager.createToken(tokenPayload)
 
         const output: SignupOutput = {
-            message: "Cadastro realizado com sucesso",
+            message: "Cadastro realizado com sucesso.",
             token
         }
 
@@ -98,18 +102,14 @@ export class UserBusiness {
     public login = async (input: LoginInputDTO): Promise<LoginOutputDTO> => {
         const { email, password } = input
 
-        if(typeof password !== "string"){
-            throw new Error("'password' deve ser string")
-        }
-
-        if(typeof email !== "string"){
-            throw new Error("'email' deve ser string")
+        if(email.length < 1 || password.length < 1){
+            throw new BadRequestError("Preencha os campos em branco.")
         }
 
         const userDB = await this.userDatabase.findUserByEmail(email)
 
         if(!userDB){
-            throw new NotFoundError("E-mail não cadastrado")
+            throw new NotFoundError("E-mail não cadastrado.")
         }
 
         const user = new User(
@@ -123,7 +123,7 @@ export class UserBusiness {
         const isPassWordCorrect = await this.hashManager.compare(password, user.getPassword())
 
         if(!isPassWordCorrect){
-            throw new BadRequestError("E-mail ou senha incorreto")
+            throw new BadRequestError("E-mail ou senha incorretos.")
         }
 
         const payload: TokenPayload =   {
@@ -134,7 +134,7 @@ export class UserBusiness {
         const token = this.tokenManager.createToken(payload)
 
         const output: LoginOutputDTO = {
-            message: "Login realizado com sucesso",
+            message: "Login realizado com sucesso.",
             token
         }
 
