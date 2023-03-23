@@ -22,3 +22,20 @@ SET password = "$2y$12$mez/RUyqUnZpYUtkQ38Te.jRE7TagJ1xGvLJukTW15IsYdC.tflIC"
 WHERE id = "u003";
 
 SELECT * FROM users;
+
+CREATE TABLE posts(
+    id TEXT PRIMARY KEY UNIQUE NOT NULL,
+    content TEXT NOT NULL,
+    likes INTEGER NOT NULL,
+    dislikes INTEGER NOT NULL,
+    created_at TEXT DEFAULT(DATETIME('now', 'localtime')),
+    updated_at TEXT DEFAULT(DATETIME('now','localtime')),
+    creator_id TEXT NOT NULL,
+    FOREIGN KEY (creator_id) REFERENCES users(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+INSERT INTO posts (id, creator_id, content, likes, dislikes)
+    VALUES
+        ('p001', 'u001', 'Testes', 0, 0);
