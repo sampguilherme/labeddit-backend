@@ -5,3 +5,8 @@ export interface GetPostsInputDTO {
 }
 
 export type GetPostsOutputDTO = PostModel[]
+
+export interface CreatePostInputDTO {
+    token: string | undefined,
+    content: unknown
+}
