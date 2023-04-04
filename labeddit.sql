@@ -39,3 +39,27 @@ CREATE TABLE posts(
 INSERT INTO posts (id, creator_id, content, likes, dislikes)
     VALUES
         ('p001', 'u001', 'Testes', 0, 0);
+
+SELECT * FROM posts;
+
+CREATE TABLE likes_dislikes (
+    user_id TEXT NOT NULL,
+    post_id TEXT NOT NULL,
+    like INTEGER NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users (id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    FOREIGN KEY (post_id) REFERENCES posts (id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+
+INSERT INTO likes_dislikes (user_id, post_id, like)
+VALUES
+    ("u002", "p001", 1),
+    ("u003", "p001", 0);
+
+UPDATE posts
+SET dislikes = 1
+WHERE id = "p001";

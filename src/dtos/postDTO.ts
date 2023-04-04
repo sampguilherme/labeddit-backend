@@ -10,3 +10,9 @@ export interface CreatePostInputDTO {
     token: string | undefined,
     content: unknown
 }
+
+export interface EditPostInputDTO {
+    idToEdit: string,
+    newContent: unknown,
+    token: string | undefined
+}
