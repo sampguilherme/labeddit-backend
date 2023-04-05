@@ -40,3 +40,9 @@ export interface PostModel {
 export interface PostWithCreatorDB extends PostDB {
     creator_name: string
 }
+
+export interface LikeDislikeDB {
+    user_id: string,
+    post_id: string,
+    like: number
+}

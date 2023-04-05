@@ -1,11 +1,11 @@
 import { PostDatabase } from "../database/PostDataBase";
-import { CreatePostInputDTO, EditPostInputDTO, GetPostsInputDTO, GetPostsOutputDTO } from "../dtos/postDTO";
+import { CreatePostInputDTO, DeletePostInputDTO, EditPostInputDTO, GetPostsInputDTO, GetPostsOutputDTO, LikeOrDislikePostInputDTO } from "../dtos/postDTO";
 import { BadRequestError } from "../errors/BadRequestError";
 import { NotFoundError } from "../errors/NotFoundError";
 import { Post } from "../models/Post";
 import { IdGenerator } from "../services/IdGenerator";
 import { TokenManager } from "../services/TokenManager";
-import { PostDB, PostWithCreatorDB } from "../types";
+import { LikeDislikeDB, PostDB, PostWithCreatorDB } from "../types";
 
 export class PostBusiness{
     constructor(
@@ -143,6 +143,91 @@ export class PostBusiness{
 
         const updatedPostDB = post.toDBModel()
 
-        await this.postDatabase.update(idToEdit, updatedPostDB)
+        await this.postDatabase.updatePost(idToEdit, updatedPostDB)
+    }
+
+    public deletePost = async (input: DeletePostInputDTO): Promise<void> => {
+        const {idToDelete, token} = input
+
+        if(!token){
+            throw new BadRequestError("'token' esta vazio")
+        }
+
+        const payload = this.tokenManager.getPayload(token)
+
+        if(!payload){
+            throw new BadRequestError("'token' inválido")
+        }
+
+
+        const postDB = await this.postDatabase.findById(idToDelete)
+
+        if(!postDB){
+            throw new NotFoundError("Post não encontrado")
+        }
+
+        const creatorId = payload.id
+
+        if(postDB.creator_id !== creatorId){
+            throw new BadRequestError("Somente quem criou o post pode deleta-lo")
+        }
+
+        await this.postDatabase.deletePost(idToDelete)
+    }
+
+    public likeOrDislikePost = async (input: LikeOrDislikePostInputDTO): Promise<void> => {
+        const { idToLikeOrDislike, token, like } = input
+
+        if(!token){
+            throw new BadRequestError("'token' esta vazio")
+        }
+
+        const payload = this.tokenManager.getPayload(token)
+
+        if(!payload){
+            throw new BadRequestError("'token' inválido")
+        }
+
+        if(typeof like !== "boolean"){
+            throw new BadRequestError("'like' deve ser boolean")
+        }
+
+        const postWithCreatorDB = await this.postDatabase.findPostWithCreatorById(idToLikeOrDislike)
+
+        if(!postWithCreatorDB){
+            throw new NotFoundError("Post não encontrado")
+        }
+
+        const userId = payload.id
+        const likeSQLite = like ? 1 : 0
+
+        const likeDislikeDB:  LikeDislikeDB = {
+            user_id: userId,
+            post_id: postWithCreatorDB.id,
+            like: likeSQLite
+        }
+
+        await this.postDatabase.likeOrDislikePost(likeDislikeDB)
+
+        const post = new Post(
+            postWithCreatorDB.id,
+            postWithCreatorDB.content,
+            postWithCreatorDB.likes,
+            postWithCreatorDB.dislikes,
+            postWithCreatorDB.created_at,
+            postWithCreatorDB.updated_at,
+            postWithCreatorDB.creator_id,
+            postWithCreatorDB.creator_name
+        )
+
+        if(like){
+            post.addLike()
+        } else {
+            post.addDislike()
+        }
+
+        const updatedPostDB = post.toDBModel()
+
+        await this.postDatabase.updatePost(idToLikeOrDislike, updatedPostDB)
     }
 }
