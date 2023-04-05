@@ -18,8 +18,8 @@ DROP TABLE users;
 SELECT * FROM users;
 
 UPDATE users
-SET password = "$2y$12$mez/RUyqUnZpYUtkQ38Te.jRE7TagJ1xGvLJukTW15IsYdC.tflIC"
-WHERE id = "u003";
+SET password = "$2y$10$A1iNjfMgajMKWp/U6yGjj.P6KxJ.Dz3kVoo46SLGeVAamQ3gS0/WO"
+WHERE id = "u002";
 
 SELECT * FROM users;
 
@@ -63,3 +63,5 @@ VALUES
 UPDATE posts
 SET dislikes = 1
 WHERE id = "p001";
+
+SELECT * FROM likes_dislikes;

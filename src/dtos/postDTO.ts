@@ -16,3 +16,14 @@ export interface EditPostInputDTO {
     newContent: unknown,
     token: string | undefined
 }
+
+export interface DeletePostInputDTO {
+    idToDelete: string,
+    token: string | undefined
+}
+
+export interface LikeOrDislikePostInputDTO {
+    idToLikeOrDislike: string,
+    token: string | undefined,
+    like: unknown
+}
