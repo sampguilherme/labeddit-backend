@@ -42,6 +42,8 @@ INSERT INTO posts (id, creator_id, content, likes, dislikes)
 
 SELECT * FROM posts;
 
+DROP TABLE posts;
+
 CREATE TABLE likes_dislikes (
     user_id TEXT NOT NULL,
     post_id TEXT NOT NULL,
@@ -65,3 +67,4 @@ SET dislikes = 1
 WHERE id = "p001";
 
 SELECT * FROM likes_dislikes;
+

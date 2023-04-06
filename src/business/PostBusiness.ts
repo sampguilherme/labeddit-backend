@@ -5,7 +5,7 @@ import { NotFoundError } from "../errors/NotFoundError";
 import { Post } from "../models/Post";
 import { IdGenerator } from "../services/IdGenerator";
 import { TokenManager } from "../services/TokenManager";
-import { LikeDislikeDB, PostDB, PostWithCreatorDB } from "../types";
+import { LikeDislikeDB, POST_LIKE, PostDB, PostWithCreatorDB } from "../types";
 
 export class PostBusiness{
     constructor(
@@ -207,8 +207,6 @@ export class PostBusiness{
             like: likeSQLite
         }
 
-        await this.postDatabase.likeOrDislikePost(likeDislikeDB)
-
         const post = new Post(
             postWithCreatorDB.id,
             postWithCreatorDB.content,
@@ -220,14 +218,39 @@ export class PostBusiness{
             postWithCreatorDB.creator_name
         )
 
-        if(like){
-            post.addLike()
+        const postLikeOrDislike = await this.postDatabase.findLikeDislike(likeDislikeDB)
+
+        if (postLikeOrDislike === POST_LIKE.ALREADY_LIKED){
+            if(like) {
+                await this.postDatabase.removeLikeDislike(likeDislikeDB)
+                post.removeLike()
+            } else {
+                await this.postDatabase.updateLikeDislike(likeDislikeDB)
+                post.removeLike()
+                post.addDislike()
+            }
+        } else if (postLikeOrDislike === POST_LIKE.ALREADY_DISLIKED) {
+            if(like) {
+                await this.postDatabase.updateLikeDislike(likeDislikeDB)
+                post.removeDislike()
+                post.addLike()
+            } else {
+                await this.postDatabase.removeLikeDislike(likeDislikeDB)
+                post.removeDislike()
+            }
         } else {
-            post.addDislike()
+            await this.postDatabase.likeOrDislikePost(likeDislikeDB)
+
+            if(like){
+                post.addLike()
+            } else {
+                post.addDislike()
+            }
         }
 
         const updatedPostDB = post.toDBModel()
 
         await this.postDatabase.updatePost(idToLikeOrDislike, updatedPostDB)
+
     }
 }
