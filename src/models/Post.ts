@@ -42,11 +42,11 @@ export class Post {
     }
 
     public addDislike() {
-        this.likes += 1
+        this.dislikes += 1
     }
 
     public removeDislike() {
-        this.likes -= 1
+        this.dislikes -= 1
     }
 
     public getDislikes(): number {
