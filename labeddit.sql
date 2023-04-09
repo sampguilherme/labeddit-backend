@@ -68,3 +68,23 @@ WHERE id = "p001";
 
 SELECT * FROM likes_dislikes;
 
+CREATE TABLE comments(
+    id TEXT PRIMARY KEY UNIQUE NOT NULL,
+    content TEXT NOT NULL,
+    likes INTEGER NOT NULL,
+    dislikes INTEGER NOT NULL,
+    created_at TEXT DEFAULT(DATETIME('now', 'localtime')),
+    updated_at TEXT DEFAULT(DATETIME('now','localtime')),
+    creator_id TEXT NOT NULL,
+    post_id TEXT NOT NULL,
+    FOREIGN KEY (creator_id) REFERENCES users(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    FOREIGN KEY (post_id) REFERENCES posts(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+INSERT INTO comments (id, post_id, creator_id, content, likes, dislikes)
+    VALUES
+    ('c001', 'p001', 'u002', 'Adorei o post', 0, 0);
