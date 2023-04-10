@@ -1,6 +1,6 @@
 import { CommentDB, CommentModel } from "../types"
 
-export class Comments {
+export class Comment {
     constructor(
         private id: string,
         private content: string,

@@ -12,8 +12,11 @@ const commentController = new CommentController(
     new CommentBusiness(
         new CommentDatabase(),
         new IdGenerator(),
-        new TokenManager()
+        new TokenManager(),
+        new PostDatabase()
     )
 )
 
 commentRouter.get('/:id', commentController.getPostComments)
+
+commentRouter.post('/:id', commentController.createComment)

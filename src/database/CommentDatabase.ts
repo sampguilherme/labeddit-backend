@@ -1,4 +1,4 @@
-import { CommentWithCreatorDB } from "../types";
+import { CommentDB, CommentWithCreatorDB } from "../types";
 import { BaseDatabase } from "./BaseDatabase";
 
 export class CommentDatabase extends BaseDatabase{
@@ -23,5 +23,11 @@ export class CommentDatabase extends BaseDatabase{
             .where({post_id: idPostToGetComments})
 
         return result
+    }
+
+    public insertComment = async (commentDB: CommentDB): Promise<void> => {
+        await BaseDatabase
+            .connection(CommentDatabase.TABLE_COMMENTS)
+            .insert(commentDB)
     }
 }
