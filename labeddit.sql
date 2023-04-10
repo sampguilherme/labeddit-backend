@@ -87,4 +87,4 @@ CREATE TABLE comments(
 
 INSERT INTO comments (id, post_id, creator_id, content, likes, dislikes)
     VALUES
-    ('c001', 'p001', 'u002', 'Adorei o post', 0, 0);
+    ('c002', 'p001', 'u003', 'Mostrando teste', 0, 0);

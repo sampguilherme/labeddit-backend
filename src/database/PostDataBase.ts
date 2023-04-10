@@ -10,13 +10,13 @@ export class PostDatabase extends BaseDatabase {
             .connection(PostDatabase.TABLE_POSTS)
             .select(
                 "posts.id",
-                    "posts.content",
-                    "posts.likes",
-                    "posts.dislikes",
-                    "posts.created_at",
-                    "posts.updated_at",
-                    "posts.creator_id",
-                    "users.nickname AS creator_name"
+                "posts.content",
+                "posts.likes",
+                "posts.dislikes",
+                "posts.created_at",
+                "posts.updated_at",
+                "posts.creator_id",
+                "users.nickname AS creator_name"
             )
             .join("users", "posts.creator_id", "=", "users.id")
 
