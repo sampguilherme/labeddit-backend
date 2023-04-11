@@ -18,5 +18,5 @@ const commentController = new CommentController(
 )
 
 commentRouter.get('/:id', commentController.getPostComments)
-
 commentRouter.post('/:id', commentController.createComment)
+commentRouter.put('/:id', commentController.editComment)

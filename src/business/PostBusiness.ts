@@ -113,7 +113,7 @@ export class PostBusiness{
             throw new BadRequestError("Seu post deve conter pelo menos 1 caractere")
         }
 
-        const postDB = await this.postDatabase.findById(idToEdit)
+        const postDB = await this.postDatabase.findPostById(idToEdit)
 
         if(!postDB){
             throw new NotFoundError("Post não encontrado")
@@ -160,7 +160,7 @@ export class PostBusiness{
         }
 
 
-        const postDB = await this.postDatabase.findById(idToDelete)
+        const postDB = await this.postDatabase.findPostById(idToDelete)
 
         if(!postDB){
             throw new NotFoundError("Post não encontrado")
