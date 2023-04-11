@@ -1,6 +1,6 @@
 import { CommentDatabase } from "../database/CommentDatabase";
 import { PostDatabase } from "../database/PostDataBase";
-import { CreateCommentInputDTO, GetCommentsInputDTO, GetCommentsOutputDTO } from "../dtos/commentsDTO";
+import { CreateCommentInputDTO, EditCommentInputDTO, GetCommentsInputDTO, GetCommentsOutputDTO } from "../dtos/commentsDTO";
 import { BadRequestError } from "../errors/BadRequestError";
 import { NotFoundError } from "../errors/NotFoundError";
 import { Comment } from "../models/Comment";
@@ -73,7 +73,7 @@ export class CommentBusiness {
             throw new BadRequestError("Seu post deve conter pelo menos 1 caractere")
         }
 
-        const postToCommentExist = await this.postDatabase.findById(idPostToComment)
+        const postToCommentExist = await this.postDatabase.findPostById(idPostToComment)
 
         if(!postToCommentExist){
             throw new NotFoundError("Post não encontrado")
@@ -100,5 +100,60 @@ export class CommentBusiness {
         const commentDB = comment.toDBModel()
 
         await this.commentDatabase.insertComment(commentDB)
+    }
+
+    public editComment = async (input: EditCommentInputDTO): Promise<void> => {
+        const { idToEdit, newContent, token} = input
+
+        if(!token){
+            throw new BadRequestError("'token' esta vazio")
+        }
+
+        const payload = this.tokenManager.getPayload(token)
+
+        if(!payload){
+            throw new BadRequestError("'token' inválido")
+        }
+
+        if(typeof newContent !== "string"){
+            throw new BadRequestError("'content' deve ser string")
+        }
+
+        if(newContent.length < 1){
+            throw new BadRequestError("Seu post deve conter pelo menos 1 caractere")
+        }
+
+        const commentDB = await this.commentDatabase.findCommentById(idToEdit)
+
+        if(!commentDB){
+            throw new NotFoundError("Comentário não encontrado")
+        }
+
+        const creatorId = payload.id
+
+        if(commentDB.creator_id !== creatorId){
+            throw new BadRequestError("Somente quem criou o comentário pode editá-lo")
+        }
+
+        const creatorName = payload.nickname
+
+        const comment = new Comment(
+            commentDB.id,
+            commentDB.content,
+            commentDB.likes,
+            commentDB.dislikes,
+            commentDB.created_at,
+            commentDB.updated_at,
+            commentDB.post_id,
+            creatorId,
+            creatorName
+        )
+
+        comment.setContent(newContent)
+        comment.setUpdatedAt(new Date().toISOString())
+
+        const updatedCommentDB = comment.toDBModel()
+
+        await this.commentDatabase.updateComment(idToEdit, updatedCommentDB)
     }
 }

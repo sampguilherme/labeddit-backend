@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
 import { CommentBusiness } from "../business/CommentBusiness";
 import { BaseError } from "../errors/BaseError";
-import { CreateCommentInputDTO, GetCommentsInputDTO } from "../dtos/commentsDTO";
+import { CreateCommentInputDTO, EditCommentInputDTO, GetCommentsInputDTO } from "../dtos/commentsDTO";
 
 export class CommentController{
     constructor(
-        private commentsBusiness: CommentBusiness
+        private commentBusiness: CommentBusiness
     ){}
 
     public getPostComments = async (req: Request, res: Response) => {
@@ -15,7 +15,7 @@ export class CommentController{
                 token: req.headers.authorization
             }
 
-            const output = await this.commentsBusiness.getPostComments(input)
+            const output = await this.commentBusiness.getPostComments(input)
 
             res.status(200).send(output)
         } catch (error) {
@@ -37,7 +37,7 @@ export class CommentController{
                 content: req.body.content
             }
 
-            await this.commentsBusiness.createComment(input)
+            await this.commentBusiness.createComment(input)
 
             res.status(200).end()
         } catch (error) {
@@ -49,5 +49,27 @@ export class CommentController{
                 res.status(500).send("Erro inesperado")
             }
         }
+    }
+
+    public editComment = async (req: Request, res: Response) => {
+        try {
+            const input: EditCommentInputDTO = {
+                idToEdit: req.params.id,
+                token: req.headers.authorization,
+                newContent: req.body.content
+            }
+
+            await this.commentBusiness.editComment(input)
+
+            res.status(200).end()
+        } catch (error) {
+            console.log(error) 
+
+            if (error instanceof BaseError) {
+                res.status(error.statusCode).send(error.message)
+            } else {
+                res.status(500).send("Erro inesperado")
+            }
         }
     }
+}
