@@ -16,10 +16,10 @@ export interface LoginOutputDTO {
     token: string
 }
 
-export interface SignupInput {
-    nickname: string,
-    email: string,
-    password: string
+export interface SignupInputDTO {
+    nickname: unknown,
+    email: unknown,
+    password: unknown
 }
 
 export interface SignupOutput {

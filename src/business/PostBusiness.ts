@@ -5,7 +5,7 @@ import { NotFoundError } from "../errors/NotFoundError";
 import { Post } from "../models/Post";
 import { IdGenerator } from "../services/IdGenerator";
 import { TokenManager } from "../services/TokenManager";
-import { LikeDislikeDB, POST_LIKE, PostDB, PostWithCreatorDB } from "../types";
+import { LikeDislikePostDB, POST_AND_COMMENT_LIKE, PostDB, PostWithCreatorDB } from "../types";
 
 export class PostBusiness{
     constructor(
@@ -201,7 +201,7 @@ export class PostBusiness{
         const userId = payload.id
         const likeSQLite = like ? 1 : 0
 
-        const likeDislikeDB:  LikeDislikeDB = {
+        const likeDislikeDB:  LikeDislikePostDB = {
             user_id: userId,
             post_id: postWithCreatorDB.id,
             like: likeSQLite
@@ -220,7 +220,7 @@ export class PostBusiness{
 
         const postLikeOrDislike = await this.postDatabase.findLikeDislike(likeDislikeDB)
 
-        if (postLikeOrDislike === POST_LIKE.ALREADY_LIKED){
+        if (postLikeOrDislike === POST_AND_COMMENT_LIKE.ALREADY_LIKED){
             if(like) {
                 await this.postDatabase.removeLikeDislike(likeDislikeDB)
                 post.removeLike()
@@ -229,7 +229,7 @@ export class PostBusiness{
                 post.removeLike()
                 post.addDislike()
             }
-        } else if (postLikeOrDislike === POST_LIKE.ALREADY_DISLIKED) {
+        } else if (postLikeOrDislike === POST_AND_COMMENT_LIKE.ALREADY_DISLIKED) {
             if(like) {
                 await this.postDatabase.updateLikeDislike(likeDislikeDB)
                 post.removeDislike()

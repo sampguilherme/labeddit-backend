@@ -56,7 +56,6 @@ CREATE TABLE likes_dislikes (
         ON UPDATE CASCADE
 );
 
-
 INSERT INTO likes_dislikes (user_id, post_id, like)
 VALUES
     ("u002", "p001", 1),
@@ -66,7 +65,9 @@ UPDATE posts
 SET dislikes = 1
 WHERE id = "p001";
 
-SELECT * FROM likes_dislikes;
+ALTER TABLE likes_dislikes RENAME TO likes_dislikes_posts;
+
+SELECT * FROM likes_dislikes_posts;
 
 CREATE TABLE comments(
     id TEXT PRIMARY KEY UNIQUE NOT NULL,
@@ -88,3 +89,17 @@ CREATE TABLE comments(
 INSERT INTO comments (id, post_id, creator_id, content, likes, dislikes)
     VALUES
     ('c002', 'p001', 'u003', 'Mostrando teste', 0, 0);
+
+CREATE TABLE likes_dislikes_comments(
+    user_id TEXT NOT NULL,
+    comment_id TEXT NOT NULL,
+    like INTEGER NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users (id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    FOREIGN KEY (comment_id) REFERENCES comments(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+DROP TABLE likes_dislikes_comments;
