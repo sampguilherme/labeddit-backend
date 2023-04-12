@@ -1,5 +1,5 @@
 import { UserDatabase } from "../database/UserDatabase";
-import { GetUsersInputDTO, GetUsersOutputDTO, LoginInputDTO, LoginOutputDTO, SignupInput, SignupOutput } from "../dtos/userDTO";
+import { GetUsersInputDTO, GetUsersOutputDTO, LoginInputDTO, LoginOutputDTO, SignupInputDTO, SignupOutput } from "../dtos/userDTO";
 import { BadRequestError } from "../errors/BadRequestError";
 import { User } from "../models/User";
 import { IdGenerator } from "../services/IdGenerator";
@@ -41,11 +41,23 @@ export class UserBusiness {
         return output
     }
 
-    public signup = async (input: SignupInput): Promise<SignupOutput> => {
+    public signup = async (input: SignupInputDTO): Promise<SignupOutput> => {
         const { nickname, email, password } = input
 
         const emailRegex = /\S+@\S+\.\S+/
         const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/
+
+        if(typeof nickname !== "string"){
+            throw new BadRequestError("'nickname' deve ser string")
+        }
+
+        if(typeof email !== "string"){
+            throw new BadRequestError("'email' deve ser string")
+        }
+
+        if(typeof password !== "string"){
+            throw new BadRequestError("'password' deve ser string")
+        }
 
         if(nickname.length < 1 || email.length < 1 || password.length < 1){
             throw new BadRequestError("Preencha os campos vazios.")

@@ -1,12 +1,12 @@
 import { CommentDatabase } from "../database/CommentDatabase";
 import { PostDatabase } from "../database/PostDataBase";
-import { CreateCommentInputDTO, EditCommentInputDTO, GetCommentsInputDTO, GetCommentsOutputDTO } from "../dtos/commentsDTO";
+import { CreateCommentInputDTO, DeleteCommentInputDTO, EditCommentInputDTO, GetCommentsInputDTO, GetCommentsOutputDTO, LikeOrDislikeCommentInputDTO } from "../dtos/commentsDTO";
 import { BadRequestError } from "../errors/BadRequestError";
 import { NotFoundError } from "../errors/NotFoundError";
 import { Comment } from "../models/Comment";
 import { IdGenerator } from "../services/IdGenerator";
 import { TokenManager } from "../services/TokenManager";
-import { CommentWithCreatorDB } from "../types";
+import { CommentWithCreatorDB, LikeDislikeCommentDB, POST_AND_COMMENT_LIKE } from "../types";
 
 export class CommentBusiness {
     constructor(
@@ -155,5 +155,112 @@ export class CommentBusiness {
         const updatedCommentDB = comment.toDBModel()
 
         await this.commentDatabase.updateComment(idToEdit, updatedCommentDB)
+    }
+
+    public deleteComment = async (input: DeleteCommentInputDTO): Promise<void> => {
+        const { idToDelete, token } = input
+
+        if(!token){
+            throw new BadRequestError("'token' esta vazio")
+        }
+
+        const payload = this.tokenManager.getPayload(token)
+
+        if(!payload){
+            throw new BadRequestError("'token' inválido")
+        }
+
+        const commentDB = await this.commentDatabase.findCommentById(idToDelete)
+
+        if(!commentDB){
+            throw new NotFoundError("Comentário não encontrado")
+        }
+
+        const creatorId = payload.id
+
+        if(commentDB.creator_id !== creatorId){
+            throw new BadRequestError("Somente quem criou o comentário pode deleta-lo")
+        }
+
+        await this.commentDatabase.deleteCommentById(idToDelete)
+    }
+
+    public likeOrDislikeComment = async (input: LikeOrDislikeCommentInputDTO): Promise<void> => {
+        const { idToLikeOrDislike, token, like } = input
+
+        if(!token){
+            throw new BadRequestError("'token' esta vazio")
+        }
+
+        const payload = this.tokenManager.getPayload(token)
+
+        if(!payload){
+            throw new BadRequestError("'token' inválido")
+        }
+
+        if(typeof like !== "boolean"){
+            throw new BadRequestError("'like' deve ser boolean")
+        }
+
+        const commentWithCreatorDB = await this.commentDatabase.findCommentWithCreatorById(idToLikeOrDislike)
+
+        if(!commentWithCreatorDB){
+            throw new NotFoundError("Comentário não encontrado")
+        }
+
+        const userID = payload.id
+        const likeSQL = like ? 1 : 0
+
+        const likeDislikeCommentDB: LikeDislikeCommentDB = {
+            user_id: userID,
+            comment_id: commentWithCreatorDB.id,
+            like: likeSQL
+        }
+
+        const comment = new Comment(
+            commentWithCreatorDB.id,
+            commentWithCreatorDB.content,
+            commentWithCreatorDB.likes,
+            commentWithCreatorDB.dislikes,
+            commentWithCreatorDB.created_at,
+            commentWithCreatorDB.updated_at,
+            commentWithCreatorDB.post_id,
+            commentWithCreatorDB.creator_id,
+            commentWithCreatorDB.creator_name
+        )
+
+        const commentLikeOrDislike = await this.commentDatabase.findLikeDislike(likeDislikeCommentDB)
+
+        if(commentLikeOrDislike === POST_AND_COMMENT_LIKE.ALREADY_LIKED){
+            if(like){
+                await this.commentDatabase.removeLikeDislike(likeDislikeCommentDB)
+                comment.removeLike()
+            } else {
+                await this.commentDatabase.updateLikeDislike(likeDislikeCommentDB)
+                comment.removeLike()
+                comment.addDislike()
+            }
+        } else if(commentLikeOrDislike === POST_AND_COMMENT_LIKE.ALREADY_DISLIKED){
+            if(like){
+                await this.commentDatabase.updateLikeDislike(likeDislikeCommentDB)
+                comment.removeDislike()
+                comment.addLike()
+            } else {
+                await this.commentDatabase.removeLikeDislike(likeDislikeCommentDB)
+                comment.removeDislike()
+            }
+        } else {
+            await this.commentDatabase.likeOrDislikeComment(likeDislikeCommentDB)
+
+            if(like){
+                comment.addLike()
+            } else {
+                comment.addDislike()
+            }
+        }
+
+        const updatedCommentDB = comment.toDBModel()
+
+        await this.commentDatabase.updateComment(idToLikeOrDislike, updatedCommentDB)
     }
 }

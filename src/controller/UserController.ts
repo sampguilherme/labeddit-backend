@@ -1,7 +1,7 @@
 
 import { Request, Response } from "express";
 import { UserBusiness } from "../business/UserBusiness";
-import { GetUsersInputDTO, LoginInputDTO, SignupInput } from "../dtos/userDTO";
+import { GetUsersInputDTO, LoginInputDTO, SignupInputDTO } from "../dtos/userDTO";
 import { BaseError } from "../errors/BaseError"
 
 
@@ -34,7 +34,7 @@ export class UserController {
 
     public signup = async (req: Request, res: Response) => {
         try {
-            const input: SignupInput = {
+            const input: SignupInputDTO = {
                 nickname: req.body.nickname,
                 email: req.body.email,
                 password: req.body.password
