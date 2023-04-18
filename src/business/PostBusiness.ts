@@ -15,7 +15,11 @@ export class PostBusiness{
     ){}
 
     public getPosts = async (input: GetPostsInputDTO): Promise<GetPostsOutputDTO> => {
-        const {token} = input
+        const {postId, token} = input
+
+        if(typeof postId !== 'string' && postId !== undefined){
+            throw new BadRequestError("'postId' deve ser string ou undefined")
+        }
 
         if(!token){
             throw new BadRequestError("'token' esta vazio")
@@ -27,7 +31,7 @@ export class PostBusiness{
             throw new BadRequestError("'token' inválido")
         }
 
-        const postsWithCreatosDB: PostWithCreatorDB[] = await this.postDatabase.findPosts()
+        const postsWithCreatosDB: PostWithCreatorDB[] = await this.postDatabase.findPosts(postId)
         
         const posts = postsWithCreatosDB.map((postWithCreatorDB) => {
             const post = new Post(

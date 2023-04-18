@@ -38,7 +38,7 @@ CREATE TABLE posts(
 
 INSERT INTO posts (id, creator_id, content, likes, dislikes)
     VALUES
-        ('p001', 'u001', 'Testes', 0, 0);
+        ('p002', 'u002', 'Teste novamente', 0, 0);
 
 SELECT * FROM posts;
 

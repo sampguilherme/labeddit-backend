@@ -1,6 +1,7 @@
 import { PostModel } from "../types"
 
 export interface GetPostsInputDTO {
+    postId: unknown,
     token: string | undefined
 }
 
