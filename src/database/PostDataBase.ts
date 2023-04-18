@@ -5,22 +5,46 @@ export class PostDatabase extends BaseDatabase {
     public static TABLE_POSTS = "posts"
     public static TABLE_LIKES_DISLIKES = "likes_dislikes_posts"
 
-    public findPosts = async (): Promise<PostWithCreatorDB[]> => {
-        const result: PostWithCreatorDB[] = await BaseDatabase
-            .connection(PostDatabase.TABLE_POSTS)
-            .select(
-                "posts.id",
-                "posts.content",
-                "posts.likes",
-                "posts.dislikes",
-                "posts.created_at",
-                "posts.updated_at",
-                "posts.creator_id",
-                "users.nickname AS creator_name"
-            )
-            .join("users", "posts.creator_id", "=", "users.id")
+    public findPosts = async (postId: string | undefined): Promise<PostWithCreatorDB[]> => {
+        let postDB
 
-        return result
+        if(postId){
+            const result: PostWithCreatorDB[] = await BaseDatabase
+                .connection(PostDatabase.TABLE_POSTS)
+                .select(
+                    "posts.id",
+                    "posts.content",
+                    "posts.likes",
+                    "posts.dislikes",
+                    "posts.created_at",
+                    "posts.updated_at",
+                    "posts.creator_id",
+                    "users.nickname AS creator_name"
+                )
+                .where({"posts.id": postId})
+                .join("users", "posts.creator_id", "=", "users.id")
+
+                postDB = result
+        } else {
+            const result: PostWithCreatorDB[] = await BaseDatabase
+                .connection(PostDatabase.TABLE_POSTS)
+                .select(
+                    "posts.id",
+                    "posts.content",
+                    "posts.likes",
+                    "posts.dislikes",
+                    "posts.created_at",
+                    "posts.updated_at",
+                    "posts.creator_id",
+                    "users.nickname AS creator_name"
+                )
+                .join("users", "posts.creator_id", "=", "users.id")
+
+                postDB = result
+        }
+        
+
+        return postDB
     }
 
     public insertPost = async (postDB: PostDB): Promise<void> => {

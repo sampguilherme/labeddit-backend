@@ -10,6 +10,7 @@ export class PostController {
     public getPosts = async (req: Request, res: Response) => {
         try {
             const input: GetPostsInputDTO = {
+                postId: req.query.q,
                 token: req.headers.authorization
             }
 
