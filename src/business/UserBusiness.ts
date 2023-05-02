@@ -105,6 +105,7 @@ export class UserBusiness {
 
         const output: SignupOutput = {
             message: "Cadastro realizado com sucesso.",
+            userId: newUser.getId(),
             token
         }
 
@@ -147,6 +148,7 @@ export class UserBusiness {
 
         const output: LoginOutputDTO = {
             message: "Login realizado com sucesso.",
+            userId: user.getId(),
             token
         }
 
