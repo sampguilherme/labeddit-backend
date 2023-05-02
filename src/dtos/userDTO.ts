@@ -13,6 +13,7 @@ export interface LoginInputDTO {
 
 export interface LoginOutputDTO {
     message: string,
+    userId: string,
     token: string
 }
 
@@ -24,5 +25,6 @@ export interface SignupInputDTO {
 
 export interface SignupOutput {
     message: string,
+    userId: string,
     token: string
 }
