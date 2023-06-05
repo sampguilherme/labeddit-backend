@@ -19,6 +19,7 @@ export interface PostDB {
     content: string,
     likes: number,
     dislikes: number,
+    comments: number,
     created_at: string,
     updated_at: string,
     creator_id: string
@@ -29,6 +30,7 @@ export interface PostModel {
     content: string,
     likes: number,
     dislikes: number,
+    comments: number
     createdAt: string,
     updatedAt: string,
     creator: {

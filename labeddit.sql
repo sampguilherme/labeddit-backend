@@ -1,4 +1,4 @@
--- Active: 1678835586943@@127.0.0.1@3306
+-- Active: 1685984988333@@127.0.0.1@3306
 CREATE TABLE users(
     id TEXT PRIMARY KEY UNIQUE NOT NULL,
     nickname TEXT NOT NULL,
@@ -28,6 +28,7 @@ CREATE TABLE posts(
     content TEXT NOT NULL,
     likes INTEGER NOT NULL,
     dislikes INTEGER NOT NULL,
+    comments INTEGER NOT NULL,
     created_at TEXT DEFAULT(DATETIME('now', 'localtime')),
     updated_at TEXT DEFAULT(DATETIME('now','localtime')),
     creator_id TEXT NOT NULL,
@@ -36,9 +37,9 @@ CREATE TABLE posts(
         ON UPDATE CASCADE
 );
 
-INSERT INTO posts (id, creator_id, content, likes, dislikes)
+INSERT INTO posts (id, creator_id, content, likes, dislikes, comments)
     VALUES
-        ('p002', 'u002', 'Teste novamente', 0, 0);
+        ('p001', 'u001', 'Teste', 0, 0, 0);
 
 SELECT * FROM posts;
 
@@ -62,8 +63,10 @@ VALUES
     ("u003", "p001", 0);
 
 UPDATE posts
-SET dislikes = 1
+SET comments = 2
 WHERE id = "p001";
+
+
 
 ALTER TABLE likes_dislikes RENAME TO likes_dislikes_posts;
 
