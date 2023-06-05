@@ -4,9 +4,10 @@ import { CreateCommentInputDTO, DeleteCommentInputDTO, EditCommentInputDTO, GetC
 import { BadRequestError } from "../errors/BadRequestError";
 import { NotFoundError } from "../errors/NotFoundError";
 import { Comment } from "../models/Comment";
+import { Post } from "../models/Post";
 import { IdGenerator } from "../services/IdGenerator";
 import { TokenManager } from "../services/TokenManager";
-import { CommentWithCreatorDB, LikeDislikeCommentDB, POST_AND_COMMENT_LIKE } from "../types";
+import { CommentWithCreatorDB, LikeDislikeCommentDB, POST_AND_COMMENT_LIKE, PostWithCreatorDB } from "../types";
 
 export class CommentBusiness {
     constructor(
@@ -73,11 +74,23 @@ export class CommentBusiness {
             throw new BadRequestError("Seu post deve conter pelo menos 1 caractere")
         }
 
-        const postToCommentExist = await this.postDatabase.findPostById(idPostToComment)
+        const postWithCreatorDB = await this.postDatabase.findPostWithCreatorById(idPostToComment)
 
-        if(!postToCommentExist){
+        if(!postWithCreatorDB){
             throw new NotFoundError("Post não encontrado")
         }
+
+        const post = new Post(
+            postWithCreatorDB.id,
+            postWithCreatorDB.content,
+            postWithCreatorDB.likes,
+            postWithCreatorDB.dislikes,
+            postWithCreatorDB.comments,
+            postWithCreatorDB.created_at,
+            postWithCreatorDB.updated_at,
+            postWithCreatorDB.creator_id,
+            postWithCreatorDB.creator_name
+        )
 
         const id = this.idGenerator.generate()
         const createdAt = new Date().toISOString()
@@ -100,6 +113,10 @@ export class CommentBusiness {
         const commentDB = comment.toDBModel()
 
         await this.commentDatabase.insertComment(commentDB)
+
+        post.addComment()
+        const updatedPostDB = post.toDBModel()
+        await this.postDatabase.updatePost(idPostToComment, updatedPostDB)
     }
 
     public editComment = async (input: EditCommentInputDTO): Promise<void> => {
@@ -182,7 +199,31 @@ export class CommentBusiness {
             throw new BadRequestError("Somente quem criou o comentário pode deleta-lo")
         }
 
+        const postId = commentDB.post_id
+
+        const postWithCreatorDB = await this.postDatabase.findPostWithCreatorById(postId)
+
+        if(!postWithCreatorDB){
+            throw new NotFoundError("Post não encontrado")
+        }
+
+        const post = new Post(
+            postWithCreatorDB.id,
+            postWithCreatorDB.content,
+            postWithCreatorDB.likes,
+            postWithCreatorDB.dislikes,
+            postWithCreatorDB.comments,
+            postWithCreatorDB.created_at,
+            postWithCreatorDB.updated_at,
+            postWithCreatorDB.creator_id,
+            postWithCreatorDB.creator_name
+        )
+
         await this.commentDatabase.deleteCommentById(idToDelete)
+
+        post.deleteComment()
+        const updatedPostDB = post.toDBModel()
+        await this.postDatabase.updatePost(postId, updatedPostDB)
     }
 
     public likeOrDislikeComment = async (input: LikeOrDislikeCommentInputDTO): Promise<void> => {

@@ -6,6 +6,7 @@ export class Post {
         private content: string,
         private likes: number,
         private dislikes: number,
+        private comments: number,
         private createdAt: string,
         private updatedAt: string,
         private creatorId: string,
@@ -49,6 +50,14 @@ export class Post {
         this.dislikes -= 1
     }
 
+    public addComment() {
+        this.comments += 1
+    }
+
+    public deleteComment() {
+        this.comments -= 1
+    }
+
     public getDislikes(): number {
         return this.dislikes
     }
@@ -90,6 +99,7 @@ export class Post {
             content: this.content,
             likes: this.likes,
             dislikes: this.dislikes,
+            comments: this.comments,
             created_at: this.createdAt,
             updated_at: this.updatedAt,
             creator_id: this.creatorId
@@ -102,6 +112,7 @@ export class Post {
             content: this.content,
             likes: this.likes,
             dislikes: this.dislikes,
+            comments: this.comments,
             createdAt: this.createdAt,
             updatedAt: this.updatedAt,
             creator: {
