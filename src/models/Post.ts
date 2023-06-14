@@ -1,4 +1,4 @@
-import { PostDB, PostModel } from "../types";
+import { POST_AND_COMMENT_LIKE, PostDB, PostModel } from "../types";
 
 export class Post {
     constructor(
@@ -6,6 +6,7 @@ export class Post {
         private content: string,
         private likes: number,
         private dislikes: number,
+        private likedOrDisliked: POST_AND_COMMENT_LIKE | null,
         private comments: number,
         private createdAt: string,
         private updatedAt: string,
@@ -48,6 +49,13 @@ export class Post {
 
     public removeDislike() {
         this.dislikes -= 1
+    }
+
+    public getLikedOrDisliked(): POST_AND_COMMENT_LIKE | null {
+        return this.likedOrDisliked
+    }
+    public setLikedOrDisliked(value: POST_AND_COMMENT_LIKE | null): void {
+        this.likedOrDisliked = value
     }
 
     public addComment() {
@@ -112,6 +120,7 @@ export class Post {
             content: this.content,
             likes: this.likes,
             dislikes: this.dislikes,
+            likedOrDisliked: this.likedOrDisliked,
             comments: this.comments,
             createdAt: this.createdAt,
             updatedAt: this.updatedAt,
