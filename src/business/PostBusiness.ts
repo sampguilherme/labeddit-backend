@@ -5,7 +5,7 @@ import { NotFoundError } from "../errors/NotFoundError";
 import { Post } from "../models/Post";
 import { IdGenerator } from "../services/IdGenerator";
 import { TokenManager } from "../services/TokenManager";
-import { LikeDislikePostDB, POST_AND_COMMENT_LIKE, PostDB, PostWithCreatorDB } from "../types";
+import { LikeDislikePostDB, POST_AND_COMMENT_LIKE, PostDB, PostModel, PostWithCreatorDB } from "../types";
 
 export class PostBusiness{
     constructor(
@@ -32,24 +32,59 @@ export class PostBusiness{
         }
 
         const postsWithCreatosDB: PostWithCreatorDB[] = await this.postDatabase.findPosts(postId)
-        
-        const posts = postsWithCreatosDB.map((postWithCreatorDB) => {
-            const post = new Post(
-                postWithCreatorDB.id,
-                postWithCreatorDB.content,
-                postWithCreatorDB.likes,
-                postWithCreatorDB.dislikes,
-                postWithCreatorDB.comments,
-                postWithCreatorDB.created_at,
-                postWithCreatorDB.updated_at,
-                postWithCreatorDB.creator_id,
-                postWithCreatorDB.creator_name
+
+        let allPosts: PostModel[] = []
+
+        for (const post of postsWithCreatosDB){
+            const likeDislikePostDB: LikeDislikePostDB = {
+                post_id: post.id,
+                user_id: payload.id,
+                like: 3
+            }
+
+            const likedOrDislikedPost = await this.postDatabase.findLikeDislike(likeDislikePostDB)
+
+            allPosts.push(
+                {
+                    id: post.id,
+                    content: post.content,
+                    likes: post.likes,
+                    dislikes: post.dislikes,
+                    likedOrDisliked: likedOrDislikedPost,
+                    comments: post.comments,
+                    createdAt: post.created_at,
+                    updatedAt: post.updated_at,
+                    creator: {
+                        id: post.creator_id,
+                        name: post.creator_name
+                    }
+                    
+                }
             )
 
-            return post.toBusinessModel()
-        })
+            console.log(allPosts)
+        }
+        
+        // const posts =  postsWithCreatosDB.map((postWithCreatorDB) => {
+        //     const post = new Post(
+        //         postWithCreatorDB.id,
+        //         postWithCreatorDB.content,
+        //         postWithCreatorDB.likes,
+        //         postWithCreatorDB.dislikes,
+        //         postWithCreatorDB.comments,
+        //         postWithCreatorDB.created_at,
+        //         postWithCreatorDB.updated_at,
+        //         postWithCreatorDB.creator_id,
+        //         postWithCreatorDB.creator_name,
+                
+        //     )
 
-        const output: GetPostsOutputDTO = posts
+        //     return post.toBusinessModel()
+        // })
+
+        
+
+        const output: GetPostsOutputDTO = allPosts
 
         return output
     }
@@ -86,11 +121,12 @@ export class PostBusiness{
             content,
             0,
             0,
+            null,
             0,
             createdAt,
             updatedAt,
             creatorId,
-            creatorName
+            creatorName,
         )
 
         const postDB = post.toDBModel()
@@ -138,6 +174,7 @@ export class PostBusiness{
             postDB.content,
             postDB.likes,
             postDB.dislikes,
+            null,
             postDB.comments,
             postDB.created_at,
             postDB.updated_at,
@@ -219,6 +256,7 @@ export class PostBusiness{
             postWithCreatorDB.content,
             postWithCreatorDB.likes,
             postWithCreatorDB.dislikes,
+            null,
             postWithCreatorDB.comments,
             postWithCreatorDB.created_at,
             postWithCreatorDB.updated_at,

@@ -30,6 +30,7 @@ export interface PostModel {
     content: string,
     likes: number,
     dislikes: number,
+    likedOrDisliked: POST_AND_COMMENT_LIKE | null,
     comments: number
     createdAt: string,
     updatedAt: string,
