@@ -5,7 +5,7 @@ import { NotFoundError } from "../errors/NotFoundError";
 import { Post } from "../models/Post";
 import { IdGenerator } from "../services/IdGenerator";
 import { TokenManager } from "../services/TokenManager";
-import { LikeDislikePostDB, POST_AND_COMMENT_LIKE, PostDB, PostModel, PostWithCreatorDB } from "../types";
+import { LikeDislikePostDB, POST_AND_COMMENT_LIKE, PostModel, PostWithCreatorDB } from "../types";
 
 export class PostBusiness{
     constructor(
@@ -33,7 +33,7 @@ export class PostBusiness{
 
         const postsWithCreatosDB: PostWithCreatorDB[] = await this.postDatabase.findPosts(postId)
 
-        let allPosts: PostModel[] = []
+        let posts: PostModel[] = []
 
         for (const post of postsWithCreatosDB){
             const likeDislikePostDB: LikeDislikePostDB = {
@@ -44,7 +44,7 @@ export class PostBusiness{
 
             const likedOrDislikedPost = await this.postDatabase.findLikeDislike(likeDislikePostDB)
 
-            allPosts.push(
+            posts.push(
                 {
                     id: post.id,
                     content: post.content,
@@ -62,7 +62,6 @@ export class PostBusiness{
                 }
             )
 
-            console.log(allPosts)
         }
         
         // const posts =  postsWithCreatosDB.map((postWithCreatorDB) => {
@@ -82,9 +81,7 @@ export class PostBusiness{
         //     return post.toBusinessModel()
         // })
 
-        
-
-        const output: GetPostsOutputDTO = allPosts
+        const output: GetPostsOutputDTO = posts
 
         return output
     }

@@ -1,4 +1,4 @@
-import { CommentDB, CommentModel } from "../types"
+import { CommentDB, CommentModel, POST_AND_COMMENT_LIKE } from "../types"
 
 export class Comment {
     constructor(
@@ -6,6 +6,7 @@ export class Comment {
         private content: string,
         private likes: number,
         private dislikes: number,
+        private likedOrDisliked: POST_AND_COMMENT_LIKE | null,
         private createdAt: string,
         private updatedAt: string,
         private postId: string,
@@ -71,6 +72,14 @@ export class Comment {
         this.postId = value
     }
 
+
+    public getLikedOrDisliked(): POST_AND_COMMENT_LIKE | null {
+        return this.likedOrDisliked
+    }
+    public setLikedOrDisliked(value:POST_AND_COMMENT_LIKE | null ): void  {
+        this.likedOrDisliked = value
+    }
+
     
     public getCreatorId(): string {
         return this.creatorId
@@ -105,6 +114,7 @@ export class Comment {
             content: this.content,
             likes: this.likes,
             dislikes: this.dislikes,
+            likedOrDisliked: this.likedOrDisliked,
             createdAt: this.createdAt,
             updatedAt: this.updatedAt,
             postId: this.postId,

@@ -7,7 +7,7 @@ import { Comment } from "../models/Comment";
 import { Post } from "../models/Post";
 import { IdGenerator } from "../services/IdGenerator";
 import { TokenManager } from "../services/TokenManager";
-import { CommentWithCreatorDB, LikeDislikeCommentDB, POST_AND_COMMENT_LIKE, PostWithCreatorDB } from "../types";
+import { CommentModel, CommentWithCreatorDB, LikeDislikeCommentDB, POST_AND_COMMENT_LIKE, PostWithCreatorDB } from "../types";
 
 export class CommentBusiness {
     constructor(
@@ -32,21 +32,51 @@ export class CommentBusiness {
 
         const commentsWithCreatosDB: CommentWithCreatorDB[] = await this.commentDatabase.findComments(idPostToGetComments)
 
-        const comments = commentsWithCreatosDB.map((postWithCreatorDB) => {
-            const comment = new Comment(
-                postWithCreatorDB.id,
-                postWithCreatorDB.content,
-                postWithCreatorDB.likes,
-                postWithCreatorDB.dislikes,
-                postWithCreatorDB.created_at,
-                postWithCreatorDB.updated_at,
-                postWithCreatorDB.post_id,
-                postWithCreatorDB.creator_id,
-                postWithCreatorDB.creator_name
-            )
+        let comments: CommentModel[] = []
 
-            return comment.toBusinessModel()
-        })
+        for(const comment of commentsWithCreatosDB){
+            const likeDislikeCommentDB: LikeDislikeCommentDB = {
+                comment_id: comment.id,
+                user_id: payload.id,
+                like: 3
+            }
+
+            const likedOrDislikedComment = await this.commentDatabase.findLikeDislike(likeDislikeCommentDB)
+
+            comments.push(
+                {
+                    id: comment.id,
+                    content: comment.content,
+                    likes: comment.likes,
+                    dislikes: comment.dislikes,
+                    likedOrDisliked: likedOrDislikedComment,
+                    postId: comment.post_id,
+                    createdAt: comment.created_at,
+                    updatedAt: comment.updated_at,
+                    creator: {
+                        id: comment.creator_id,
+                        name: comment.creator_name
+                    }
+                    
+                }
+            )
+        }
+
+        // const comments = commentsWithCreatosDB.map((postWithCreatorDB) => {
+        //     const comment = new Comment(
+        //         postWithCreatorDB.id,
+        //         postWithCreatorDB.content,
+        //         postWithCreatorDB.likes,
+        //         postWithCreatorDB.dislikes,
+        //         postWithCreatorDB.created_at,
+        //         postWithCreatorDB.updated_at,
+        //         postWithCreatorDB.post_id,
+        //         postWithCreatorDB.creator_id,
+        //         postWithCreatorDB.creator_name
+        //     )
+
+        //     return comment.toBusinessModel()
+        // })
 
         const output: GetCommentsOutputDTO = comments
 
@@ -104,6 +134,7 @@ export class CommentBusiness {
             content,
             0,
             0,
+            null,
             createdAt,
             updatedAt,
             idPostToComment,
@@ -160,6 +191,7 @@ export class CommentBusiness {
             commentDB.content,
             commentDB.likes,
             commentDB.dislikes,
+            null,
             commentDB.created_at,
             commentDB.updated_at,
             commentDB.post_id,
@@ -265,6 +297,7 @@ export class CommentBusiness {
             commentWithCreatorDB.content,
             commentWithCreatorDB.likes,
             commentWithCreatorDB.dislikes,
+            null,
             commentWithCreatorDB.created_at,
             commentWithCreatorDB.updated_at,
             commentWithCreatorDB.post_id,
