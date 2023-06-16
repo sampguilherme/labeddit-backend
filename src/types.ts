@@ -71,6 +71,7 @@ export interface CommentModel {
     content: string,
     likes: number,
     dislikes: number,
+    likedOrDisliked: POST_AND_COMMENT_LIKE | null,
     createdAt: string,
     updatedAt: string,
     postId: string,
