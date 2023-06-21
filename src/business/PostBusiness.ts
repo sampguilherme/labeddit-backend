@@ -15,7 +15,7 @@ export class PostBusiness{
     ){}
 
     public getPosts = async (input: GetPostsInputDTO): Promise<GetPostsOutputDTO> => {
-        const {postId,token} = input
+        const {postId, token} = input
 
         if(typeof postId !== 'string' && postId !== undefined){
             throw new BadRequestError("'postId' deve ser string ou undefined")
