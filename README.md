@@ -38,7 +38,7 @@ Outras ferramentas utilizadas: Postman, Render.
     ```sh
     renomear o arquivo ".env.example" para ".env"
     ```
-4. Rodar o servidor localmente
+2. Rodar o servidor localmente
     ```
     npm run dev
     ```
