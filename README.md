@@ -31,7 +31,10 @@ Outras ferramentas utilizadas: Postman, Render.
     ```sh
     npm install
     ```
-3. Renomear .env
+
+### Configuração:
+
+1. Renomear .env
     ```sh
     renomear o arquivo ".env.example" para ".env"
     ```
