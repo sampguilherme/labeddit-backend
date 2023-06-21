@@ -1,4 +1,4 @@
-# Labeddit-Frontend
+# Labeddit-Backend
 
 ## Sobre
 Labbedit é uma rede social onde o usuário pode criar uma conta ou entrar em uma já existente para ter
