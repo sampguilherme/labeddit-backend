@@ -1,4 +1,4 @@
-# Labeddit-Frontend
+# Labeddit-Backend
 
 ## Sobre
 Labbedit é uma rede social onde o usuário pode criar uma conta ou entrar em uma já existente para ter
@@ -31,11 +31,14 @@ Outras ferramentas utilizadas: Postman, Render.
     ```sh
     npm install
     ```
-3. Renomear .env
+
+### Configuração:
+
+1. Renomear .env
     ```sh
     renomear o arquivo ".env.example" para ".env"
     ```
-4. Rodar o servidor localmente
+2. Rodar o servidor localmente
     ```
     npm run dev
     ```
